@@ -35,10 +35,6 @@
         "icon": "$(eye)"
       },
       {
-        "command": "n8n-editor.saveWorkflow",
-        "title": "N8N: Save Workflow"
-      },
-      {
         "command": "n8n-editor.configure",
         "title": "N8N: Configure API Connection",
         "icon": "$(gear)"
