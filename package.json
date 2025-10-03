@@ -1,0 +1,142 @@
+{
+  "name": "n8n-editor",
+  "displayName": "N8N Workflow Editor",
+  "description": "Edit N8N workflows with visual preview and API integration",
+  "version": "0.0.1",
+  "publisher": "sudwe3",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sudwe3/n8n-editor.git"
+  },
+  "engines": {
+    "vscode": "^1.104.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:json"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "n8n-editor.openWorkflow",
+        "title": "N8N: Open Workflow from File"
+      },
+      {
+        "command": "n8n-editor.openFromApi",
+        "title": "N8N: Open from Instance"
+      },
+      {
+        "command": "n8n-editor.preview",
+        "title": "N8N: Preview Workflow",
+        "icon": "$(eye)"
+      },
+      {
+        "command": "n8n-editor.saveWorkflow",
+        "title": "N8N: Save Workflow"
+      },
+      {
+        "command": "n8n-editor.configure",
+        "title": "N8N: Configure API Connection",
+        "icon": "$(gear)"
+      },
+      {
+        "command": "n8n-editor.refreshWorkflows",
+        "title": "N8N: Refresh Workflows",
+        "icon": "$(refresh)"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "n8nNodesView",
+          "name": "N8N Nodes"
+        },
+        {
+          "id": "n8nWorkflowsView",
+          "name": "N8N Workflows"
+        }
+      ]
+    },
+    "viewsWelcome": [
+      {
+        "view": "n8nWorkflowsView",
+        "contents": "Configure N8N API connection to see workflows.\n[Configure](command:n8n-editor.configure)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "n8n-editor.configure",
+          "when": "view == n8nWorkflowsView",
+          "group": "navigation"
+        },
+        {
+          "command": "n8n-editor.refreshWorkflows",
+          "when": "view == n8nWorkflowsView",
+          "group": "navigation"
+        },
+        {
+          "command": "n8n-editor.preview",
+          "when": "view == n8nNodesView",
+          "group": "navigation"
+        }
+      ],
+      "editor/title": [
+        {
+          "command": "n8n-editor.preview",
+          "group": "navigation"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "n8n-editor.preview"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "N8N Editor",
+      "properties": {
+        "n8n.apiUrl": {
+          "type": "string",
+          "default": "",
+          "description": "N8N instance base URL"
+        },
+        "n8n.apiKey": {
+          "type": "string",
+          "default": "",
+          "description": "N8N API key"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "npm run check-types && npm run lint && node esbuild.js",
+    "watch": "npm-run-all -p watch:*",
+    "watch:esbuild": "node esbuild.js --watch",
+    "watch:tsc": "tsc --noEmit --watch --project tsconfig.json",
+    "package": "npm run check-types && npm run lint && node esbuild.js --production",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "npm run compile-tests && npm run compile && npm run lint",
+    "check-types": "tsc --noEmit",
+    "lint": "eslint src",
+    "test": "vscode-test"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.104.0",
+    "@types/mocha": "^10.0.10",
+    "@types/node": "22.x",
+    "@typescript-eslint/eslint-plugin": "^8.45.0",
+    "@typescript-eslint/parser": "^8.45.0",
+    "eslint": "^9.36.0",
+    "esbuild": "^0.25.10",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.9.3",
+    "@vscode/test-cli": "^0.0.11",
+    "@vscode/test-electron": "^2.5.2"
+  }
+}
