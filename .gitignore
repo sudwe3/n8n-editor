@@ -6,3 +6,4 @@ dist
 .vscode-test.*
 *.log
 vsc-extension-quickstart.md
+n8n-workflows

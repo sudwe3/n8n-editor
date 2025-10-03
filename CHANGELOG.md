@@ -2,6 +2,17 @@
 
 All notable changes to the "n8n-editor" extension will be documented in this file.
 
+## [0.0.2] - 2025-10-03
+
+### Changed
+- Workflows now saved as real files in `n8n-workflows/` folder
+- Files accessible to Claude Code, Copilot, and other tools
+- Removed webview panels - nodes open directly in workflow file
+- Folder name changed from `.n8n-workflows` to `n8n-workflows` for visibility
+
+### Fixed
+- File access for AI coding assistants
+
 ## [0.0.1] - 2025-10-03
 
 ### Added

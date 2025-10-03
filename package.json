@@ -2,7 +2,7 @@
   "name": "n8n-editor",
   "displayName": "N8N Workflow Editor",
   "description": "Edit N8N workflows with visual preview and API integration",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "sudwe3",
   "icon": "icon.png",
   "repository": {
