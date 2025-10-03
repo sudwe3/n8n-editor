@@ -30,11 +30,6 @@
         "title": "N8N: Open from Instance"
       },
       {
-        "command": "n8n-editor.preview",
-        "title": "N8N: Preview Workflow",
-        "icon": "$(eye)"
-      },
-      {
         "command": "n8n-editor.configure",
         "title": "N8N: Configure API Connection",
         "icon": "$(gear)"
@@ -74,22 +69,6 @@
           "command": "n8n-editor.refreshWorkflows",
           "when": "view == n8nWorkflowsView",
           "group": "navigation"
-        },
-        {
-          "command": "n8n-editor.preview",
-          "when": "view == n8nNodesView",
-          "group": "navigation"
-        }
-      ],
-      "editor/title": [
-        {
-          "command": "n8n-editor.preview",
-          "group": "navigation"
-        }
-      ],
-      "commandPalette": [
-        {
-          "command": "n8n-editor.preview"
         }
       ]
     },
