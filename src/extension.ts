@@ -96,21 +96,29 @@ export function activate(context: vscode.ExtensionContext) {
                 return;
             }
             
-            const n8nFolder = path.join(workspaceFolder.uri.fsPath, 'n8n-workflows');
-            if (!fs.existsSync(n8nFolder)) {
-                fs.mkdirSync(n8nFolder, { recursive: true });
+            const workflowName = workflow.name?.replace(/[^a-z0-9]/gi, '_') || 'workflow';
+            const workflowFolder = path.join(workspaceFolder.uri.fsPath, 'n8n-workflows', `${workflowName}_${workflowId}`);
+            
+            if (fs.existsSync(workflowFolder)) {
+                fs.rmSync(workflowFolder, { recursive: true, force: true });
             }
+            fs.mkdirSync(workflowFolder, { recursive: true });
             
-            const fileName = `${workflow.name?.replace(/[^a-z0-9]/gi, '_') || 'workflow'}_${workflowId}.json`;
-            const filePath = path.join(n8nFolder, fileName);
+            const workflowFile = path.join(workflowFolder, 'workflow.json');
+            fs.writeFileSync(workflowFile, JSON.stringify(workflow, null, 2));
+            currentFilePath = workflowFile;
             
-            fs.writeFileSync(filePath, JSON.stringify(workflow, null, 2));
-            currentFilePath = filePath;
+            const nodesFolder = path.join(workflowFolder, 'nodes');
+            fs.mkdirSync(nodesFolder, { recursive: true });
             
-            const doc = await vscode.workspace.openTextDocument(filePath);
-            await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
+            workflow.nodes.forEach((node: any, index: number) => {
+                const nodeName = node.name?.replace(/[^a-z0-9]/gi, '_') || `node_${index}`;
+                const nodeFile = path.join(nodesFolder, `${index}_${nodeName}.json`);
+                fs.writeFileSync(nodeFile, JSON.stringify(node, null, 2));
+            });
             
             nodesTreeProvider.updateWorkflow(workflow);
+            vscode.window.showInformationMessage(`Workflow loaded: ${workflow.name || 'Untitled'}. Select a node to edit.`);
         } catch (error) {
             vscode.window.showErrorMessage(`Failed to load workflow: ${error}`);
         }
@@ -146,35 +154,39 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     const saveWorkflowCommand = vscode.commands.registerCommand('n8n-editor.saveWorkflow', async () => {
-        const editor = vscode.window.activeTextEditor;
-        if (!editor) {
-            vscode.window.showErrorMessage('No active editor');
-            return;
-        }
-
-        const filePath = editor.document.uri.fsPath;
-        
-        if (!filePath.includes('n8n-workflows')) {
-            vscode.window.showWarningMessage('This is not an n8n workflow file');
-            return;
-        }
-
-        await editor.document.save();
-
-        const match = filePath.match(/_([a-zA-Z0-9-]+)\.json$/);
-        const workflowId = match ? match[1] : currentWorkflowId;
-
-        if (!workflowId) {
-            vscode.window.showErrorMessage('Cannot determine workflow ID');
+        if (!currentFilePath || !currentWorkflowId) {
+            vscode.window.showErrorMessage('No workflow loaded');
             return;
         }
 
         try {
-            const content = fs.readFileSync(filePath, 'utf8');
-            const workflow = JSON.parse(content);
-            await n8nApi.updateWorkflow(workflowId, workflow);
+            const workflowFolder = path.dirname(currentFilePath);
+            const nodesFolder = path.join(workflowFolder, 'nodes');
+            
+            const workflowContent = fs.readFileSync(currentFilePath, 'utf8');
+            const workflow = JSON.parse(workflowContent);
+            
+            const nodeFiles = fs.readdirSync(nodesFolder);
+            const updatedNodes: any[] = [];
+            
+            nodeFiles.forEach(file => {
+                const match = file.match(/^(\d+)_/);
+                if (match) {
+                    const index = parseInt(match[1]);
+                    const nodeContent = fs.readFileSync(path.join(nodesFolder, file), 'utf8');
+                    const node = JSON.parse(nodeContent);
+                    updatedNodes[index] = node;
+                }
+            });
+            
+            workflow.nodes = updatedNodes.filter(n => n !== undefined);
+            
+            fs.writeFileSync(currentFilePath, JSON.stringify(workflow, null, 2));
+            
+            await n8nApi.updateWorkflow(currentWorkflowId, workflow);
             currentWorkflowData = workflow;
             nodesTreeProvider.updateWorkflow(workflow);
+            
             vscode.window.showInformationMessage('Workflow saved to n8n');
         } catch (error) {
             vscode.window.showErrorMessage(`Failed to save: ${error}`);
@@ -228,38 +240,23 @@ export function activate(context: vscode.ExtensionContext) {
             return;
         }
 
-        if (!currentFilePath || !fs.existsSync(currentFilePath)) {
-            vscode.window.showErrorMessage('No workflow file open. Open a workflow from n8n first.');
+        if (!currentFilePath) {
+            vscode.window.showErrorMessage('No workflow loaded');
             return;
         }
 
-        const doc = await vscode.workspace.openTextDocument(currentFilePath);
-        const editor = await vscode.window.showTextDocument(doc, vscode.ViewColumn.One);
-        
-        const text = doc.getText();
-        const nodeName = node.name;
-        const searchPattern = `"name": "${nodeName}"`;
-        const nodePosition = text.indexOf(searchPattern);
-        
-        if (nodePosition !== -1) {
-            const position = doc.positionAt(nodePosition);
-            editor.selection = new vscode.Selection(position, position);
-            editor.revealRange(new vscode.Range(position, position), vscode.TextEditorRevealType.InCenter);
+        const workflowFolder = path.dirname(currentFilePath);
+        const nodesFolder = path.join(workflowFolder, 'nodes');
+        const nodeName = node.name?.replace(/[^a-z0-9]/gi, '_') || `node_${index}`;
+        const nodeFile = path.join(nodesFolder, `${index}_${nodeName}.json`);
+
+        if (!fs.existsSync(nodeFile)) {
+            vscode.window.showErrorMessage('Node file not found');
+            return;
         }
 
-        const onSave = async () => {
-            if (currentWorkflowId && currentFilePath) {
-                try {
-                    const updatedContent = fs.readFileSync(currentFilePath, 'utf8');
-                    const updatedWorkflow = JSON.parse(updatedContent);
-                    await n8nApi.updateWorkflow(currentWorkflowId, updatedWorkflow);
-                    nodesTreeProvider.updateWorkflow(updatedWorkflow);
-                    vscode.window.showInformationMessage('Workflow saved to n8n');
-                } catch (error) {
-                    vscode.window.showErrorMessage(`Failed to save: ${error}`);
-                }
-            }
-        };
+        const doc = await vscode.workspace.openTextDocument(nodeFile);
+        await vscode.window.showTextDocument(doc, vscode.ViewColumn.Two);
     });
 
     vscode.workspace.onDidOpenTextDocument(doc => {
