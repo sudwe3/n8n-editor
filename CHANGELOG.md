@@ -2,7 +2,7 @@
 
 All notable changes to the "n8n-editor" extension will be documented in this file.
 
-## [0.0.2] - 2025-10-03
+## [0.0.3] - 2025-10-03
 
 ### Changed
 - Workflows now saved as real files in `n8n-workflows/` folder
