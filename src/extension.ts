@@ -4,8 +4,6 @@ import * as path from 'path';
 import { N8NApi } from './api/n8nApi';
 import { NodesTreeProvider } from './providers/nodesTreeProvider';
 import { WorkflowsTreeProvider } from './providers/workflowsTreeProvider';
-import { PreviewPanel } from './views/previewPanel';
-import { NodeEditorPanel } from './views/nodeEditorPanel';
 
 let currentWorkflowData: any = null;
 let currentFilePath: string | undefined = undefined;
@@ -124,23 +122,7 @@ export function activate(context: vscode.ExtensionContext) {
         }
     });
 
-    const previewCommand = vscode.commands.registerCommand('n8n-editor.preview', async () => {
-        if (!currentWorkflowId) {
-            vscode.window.showErrorMessage('No workflow loaded');
-            return;
-        }
 
-        try {
-            const workflowId = currentWorkflowId;
-            const workflow = await n8nApi.getWorkflow(workflowId);
-            PreviewPanel.createOrShow(context.extensionUri, workflow, async () => {
-                const refreshedWorkflow = await n8nApi.getWorkflow(workflowId);
-                return refreshedWorkflow;
-            });
-        } catch (error) {
-            vscode.window.showErrorMessage(`Preview failed: ${error}`);
-        }
-    });
 
     const saveWorkflowCommand = vscode.commands.registerCommand('n8n-editor.saveWorkflow', async () => {
         if (!currentFilePath || !currentWorkflowId) {
@@ -372,7 +354,7 @@ Changes will be saved to ${nodeFile} when you run "N8N: Save Workflow"`);
         openWorkflowCommand,
         openFromApiCommand,
         openWorkflowFromTreeCommand,
-        previewCommand,
+        saveWorkflowCommand,
         configureCommand,
         refreshWorkflowsCommand,
         selectNodeCommand
