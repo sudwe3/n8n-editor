@@ -17,7 +17,7 @@ VSCode extension for editing N8N workflows with tree view, syntax highlighting, 
 
 1. Download the latest `.vsix` file from [Releases](https://github.com/sudwe3/n8n-editor/releases)
 2. Open VSCode
-3. Go to Extensions (Cmd+Shift+X)
+3. Go to Extensions (Ctrl+Shift+X / Cmd+Shift+X)
 4. Click "..." menu > Install from VSIX
 5. Select the downloaded file
 
@@ -36,7 +36,7 @@ This creates `n8n-editor-0.0.1.vsix` in the root directory. Install it using the
 
 ### 1. Configure N8N Connection
 
-- Press `Cmd+Shift+P`
+- Press `Ctrl+Shift+P` (Windows/Linux) or `Cmd+Shift+P` (Mac)
 - Search "N8N: Configure API Connection"
 - Enter your n8n base URL (e.g., `https://your-n8n.com`)
 - Enter your n8n API key
@@ -48,7 +48,7 @@ This creates `n8n-editor-0.0.1.vsix` in the root directory. Install it using the
 - Click a workflow to load it
 - Click any node in the tree to edit
 - For code nodes, switch to "Code" tab for JavaScript editing
-- Changes save automatically to n8n
+- Changes save automatically to n8n or press `Ctrl+S` / `Cmd+S`
 
 ### 3. Preview Workflows
 
@@ -58,6 +58,7 @@ Click the eye icon in the toolbar to preview the workflow visually.
 
 - VSCode 1.104.0 or higher
 - Access to an n8n instance with API enabled
+- Works on Windows, Mac, and Linux
 
 ## Getting N8N API Key
 

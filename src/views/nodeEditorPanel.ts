@@ -189,7 +189,7 @@ export class NodeEditorPanel {
             ${hasCode ? '<div id="codeEditor" class="editor-content"></div>' : ''}
         </div>
         <div id="info">
-            Auto-saves on panel close • Press Cmd/Ctrl+S to save manually
+            Auto-saves on panel close • Press Ctrl/Cmd+S to save manually
         </div>
     </div>
     

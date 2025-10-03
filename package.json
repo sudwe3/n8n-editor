@@ -4,6 +4,7 @@
   "description": "Edit N8N workflows with visual preview and API integration",
   "version": "0.0.1",
   "publisher": "sudwe3",
+  "icon": "icon.png",
   "repository": {
     "type": "git",
     "url": "https://github.com/sudwe3/n8n-editor.git"
